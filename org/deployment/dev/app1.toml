@@ -1,0 +1,20 @@
+[app1]
+description = "App app1 is for experimenting with application delivery"
+owner = "Amal"
+
+[app1.dev.image]
+name = "app1"
+tag = "latest"
+
+[[app1.dev.configs]]
+key = "COLOR"
+value = "blue"
+description = "After extensive review, Design Team chose blue for app1 color--see ... discussion."
+owner = "Max"
+
+[[app1.dev.secrets]]
+key = "PASSWORD"
+secret_id = "app-dev1"
+secret_version = "08aade62"
+description = "To manually add users, log into the admin user with this password. Todo: Add a user sign-up webflow since manually adding users is time-consuming--see https://xkcd.com/2565/ docs."
+owner = "Max"

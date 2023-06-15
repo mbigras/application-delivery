@@ -1,0 +1,10 @@
+#!/bin/bash
+# Script 2-deploy-app1-to-kubernetes deploys app1:latest Docker image to Kubernetes--that is, create an app1 Kuberentes Deployment object that creates an app1 Kuberentes ReplicaSet that creates app1-* Kubernetes Pods that create app1 Docker containers.
+
+if ! docker images | awk '$1 == "app1"' >/dev/null
+then
+	echo 'Failed to find app1:latest Docker image. To build app1:latest Docker image, run the `make build` command.' >&2
+	exit 1
+fi
+
+kubectl apply -f org/kubernetes/dev/app1.yaml

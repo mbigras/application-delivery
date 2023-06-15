@@ -1,0 +1,27 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: app2
+  labels:
+    app: app2
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: app2
+  template:
+    metadata:
+      labels:
+        app: app2
+    spec:
+      containers:
+      - name: app2
+        image: app2:latest
+        imagePullPolicy: Never # Gotcha: Accommodate running the app2:latest local Docker image. Todo: Make imagePullPolicy configurable.
+        env:
+          - name: ENV
+            value: prod
+          - name: COLOR
+            value: expensivegreen
+          - name: PASSWORD
+            value: ""

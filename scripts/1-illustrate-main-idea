@@ -1,0 +1,42 @@
+#!/bin/bash
+# Script 1-illustrate-main-idea illustrates the main idea of application delivery where you do the following:
+#
+# 1. Separate code from config and secrets--aligns with Heroku gold standard.
+# 2. Inject config and secrets as environment variables--aligns with 12-factor app approach.
+# 3. Get secret value from hypothetical secrets manager based on secret key, secret id, and secret version. For example, to get password123 secret value; run the `SECRET=app1-dev VERSION=08aade62 get-secret` command.
+
+
+# Gotcha: Depends on get-secret script to a directory in your PATH environment variable. To install get-secret command, run the `sudo make install` command.
+if ! command -v get-secret >/dev/null
+then
+	echo 'Failed to find get-secret command. To install get-secret command, run the `sudo make install` command.' >&2
+	exit 1
+fi
+
+app_image=caddy:2 \
+app_env=dev \
+app_color=blue \
+secret_id=app1-dev \
+secret_version=08aade62 \
+&& app_password="$(SECRET=$secret_id VERSION=$secret_version get-secret \
+	| docker run --rm -i mikefarah/yq:4 .PASSWORD)" \
+&& docker rm -f main-idea &>/dev/null \
+&& docker run --name main-idea \
+--env=ENV="$app_env" \
+--env=COLOR="$app_color" \
+--env=PASSWORD="$app_password" \
+--publish='8080:80' \
+--detach \
+$app_image \
+caddy respond --listen=:80 \
+--body='{
+	"app":"app1",
+	"env":"{env.ENV}",
+	"color":"{env.COLOR}",
+	"password":"{env.PASSWORD}"
+}' >/dev/null \
+&& curl -s --retry 3 --retry-all-errors localhost:8080 \
+	| docker run --rm -i mikefarah/yq:4 -o=json -I4 \
+&& docker rm -f main-idea >/dev/null
+
+exit 0
